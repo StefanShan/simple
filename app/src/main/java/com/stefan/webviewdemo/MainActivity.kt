@@ -17,6 +17,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.setPadding
+import com.stefan.webviewdemo.parallel.ParallelWebViewActivity
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -28,17 +29,18 @@ class MainActivity : AppCompatActivity() {
             v.setPadding(0,systemBars.top,0,systemBars.bottom)
             insets
         }
-
-        findViewById<TextView>(R.id.tv_jump_webview1).setOnClickListener {
-            DynamicWebViewActivity.jump2WebView(this,"https://juejin.cn/user/3175045310722119")
-        }
-
-        findViewById<TextView>(R.id.tv_jump_webview2).setOnClickListener {
-            DynamicWebViewActivity.jump2WebView(this,"https://juejin.cn/post/7043706765879279629")
-        }
+//
+//        findViewById<TextView>(R.id.tv_jump_webview1).setOnClickListener {
+//            DynamicWebViewActivity.jump2WebView(this,"https://juejin.cn/user/3175045310722119")
+//        }
+//
+//        findViewById<TextView>(R.id.tv_jump_webview2).setOnClickListener {
+//            DefaultWebViewActivity.jump2WebView(this,"https://juejin.cn/user/3175045310722119")
+////            DynamicWebViewActivity.jump2WebView(this,"https://juejin.cn/post/7043706765879279629")
+//        }
 
         findViewById<TextView>(R.id.tv_jump_webview3).setOnClickListener {
-            DynamicWebViewActivity.jump2WebView(this,"https://juejin.cn/post/7086284339364757517")
+            ParallelWebViewActivity.jump2WebView(this,"file:///android_asset/parallel_h5.html")
         }
     }
 

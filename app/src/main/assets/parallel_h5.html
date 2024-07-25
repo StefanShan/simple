@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Info</title>
+    <style>
+        .container {
+            text-align: center;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .head {
+            height: 200px;
+            border-radius: 10%;
+            object-fit: fill;
+        }
+        .title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        .content {
+            font-size: 18px;
+            color: #666;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img id="head" class="head" src="">
+        <div id="title" class="title"></div>
+        <div id="content" class="content"></div>
+    </div>
+
+    <script>
+        function send2pageData(result) {
+            console.log(`result = ${result}`)
+            var data = JSON.parse(result)
+            document.getElementById('head').src = data.picUrl
+            document.getElementById('title').innerText = data.title
+            document.getElementById('content').innerText = data.description
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            var result = webDemoJSBridge.getPageData()
+            console.log(`result[dom] = ${result}`)
+            if (result == "") return
+            var data = JSON.parse(result)
+            document.getElementById('head').src = data.picUrl
+            document.getElementById('title').innerText = data.title
+            document.getElementById('content').innerText = data.description
+        });
+    </script>
+</body>
+</html>

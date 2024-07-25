@@ -16,6 +16,12 @@
         android:theme="@style/Theme.WebViewDemo"
         tools:targetApi="31">
         <activity
+            android:name=".parallel.ParallelWebViewActivity"
+            android:exported="false" />
+        <activity
+            android:name=".DefaultWebViewActivity"
+            android:exported="false" />
+        <activity
             android:name=".DynamicWebViewActivity"
             android:exported="false" />
         <activity

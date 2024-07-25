@@ -8,6 +8,7 @@
     tools:context=".MainActivity">
 
     <TextView
+        android:visibility="gone"
         android:id="@+id/tv_jump_webview1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -20,6 +21,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
+        android:visibility="gone"
         android:id="@+id/tv_jump_webview2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
