@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.webkit.JavascriptInterface
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
@@ -19,6 +20,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.stefan.webviewdemo.R
+import com.stefan.webviewdemo.TimeUtil
+import com.stefan.webviewdemo.pre_reuse.WebViewHolder
 import kotlin.random.Random
 
 class ParallelWebViewActivity : AppCompatActivity() {
@@ -35,7 +38,7 @@ class ParallelWebViewActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContentView(R.layout.activity_parallel_web_view)
+        setContentView(R.layout.activity_web_view)
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
@@ -49,8 +52,8 @@ class ParallelWebViewActivity : AppCompatActivity() {
             webView.loadUrl("javascript:send2pageData('$it')")
         }
 
-        val container = findViewById<FrameLayout>(R.id.fl_parallel_container)
-        webView = WebView(this)
+        val container = findViewById<FrameLayout>(R.id.fl_container)
+        webView = WebViewHolder.instance.bind(this)
         webView.settings.javaScriptEnabled=true
         webView.addJavascriptInterface(JSBridge(webViewModel),"webDemoJSBridge")
         webView.webViewClient = object : WebViewClient(){
@@ -71,6 +74,7 @@ class ParallelWebViewActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         webView.removeJavascriptInterface("webDemoJSBridge")
+        WebViewHolder.instance.release()
     }
 }
 
@@ -78,6 +82,16 @@ internal class JSBridge(private val webViewModel: WebViewModel) {
     @JavascriptInterface
     fun getPageData(): String{
         return webViewModel.data.value?:""
+    }
+
+    @JavascriptInterface
+    fun onDOMLoaded(){
+        Log.e("chenshan", "onDOMLoaded -> ${TimeUtil.end()}")
+    }
+
+    @JavascriptInterface
+    fun onPageLoaded(){
+        Log.e("chenshan", "onPageLoaded -> ${TimeUtil.end()}")
     }
 }
 

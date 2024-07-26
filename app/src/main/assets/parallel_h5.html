@@ -35,24 +35,29 @@
         <div id="title" class="title"></div>
         <div id="content" class="content"></div>
     </div>
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script>
         function send2pageData(result) {
-            console.log(`result = ${result}`)
             var data = JSON.parse(result)
             document.getElementById('head').src = data.picUrl
             document.getElementById('title').innerText = data.title
             document.getElementById('content').innerText = data.description
         }
         document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM加载完成');
+            webDemoJSBridge.onDOMLoaded()
             var result = webDemoJSBridge.getPageData()
-            console.log(`result[dom] = ${result}`)
             if (result == "") return
             var data = JSON.parse(result)
             document.getElementById('head').src = data.picUrl
             document.getElementById('title').innerText = data.title
             document.getElementById('content').innerText = data.description
         });
+
+        window.onload = () => {
+            console.log('页面加载完成');
+            webDemoJSBridge.onPageLoaded()
+        };
     </script>
 </body>
 </html>

@@ -8,27 +8,25 @@
     tools:context=".MainActivity">
 
     <TextView
-        android:visibility="gone"
         android:id="@+id/tv_jump_webview1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@color/black"
         android:padding="20dp"
-        android:text="跳转 WebView1"
+        android:text="预初始化WebView"
         android:textColor="@color/white"
         android:textSize="16sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:visibility="gone"
         android:id="@+id/tv_jump_webview2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:background="@color/black"
         android:padding="20dp"
-        android:text="跳转 WebView2"
+        android:text="并行加载 WebView"
         android:textColor="@color/white"
         android:textSize="16sp"
         app:layout_constraintStart_toStartOf="parent"
@@ -41,10 +39,35 @@
         android:layout_marginTop="10dp"
         android:background="@color/black"
         android:padding="20dp"
-        android:text="跳转 WebView3"
+        android:text="本地缓存WebView"
         android:textColor="@color/white"
         android:textSize="16sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tv_jump_webview2" />
 
+    <TextView
+        android:id="@+id/tv_jump_webview4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:background="@color/black"
+        android:padding="20dp"
+        android:text="预请求WebView"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_jump_webview3" />
+
+    <TextView
+        android:id="@+id/tv_jump_webview5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:background="@color/black"
+        android:padding="20dp"
+        android:text="预加载WebView"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_jump_webview4" />
 </androidx.constraintlayout.widget.ConstraintLayout>
