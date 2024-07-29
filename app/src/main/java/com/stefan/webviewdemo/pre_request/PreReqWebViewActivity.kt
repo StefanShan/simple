@@ -6,22 +6,20 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import android.view.View
 import android.webkit.WebResourceRequest
+import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.FrameLayout
+import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import com.stefan.webviewdemo.R
-import com.stefan.webviewdemo.pre_reuse.WebViewHolder
+import com.stefan.webviewdemo.TimeUtil
 import okhttp3.Call
-import okhttp3.FormBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
@@ -39,7 +37,7 @@ object PreRequestUtil {
     fun preRequest(url: String) {
         OkHttpClient().newCall(Request.Builder().url(url).build()).enqueue(object : okhttp3.Callback {
             override fun onFailure(call: Call, e: IOException) {
-                Log.e("chenshan", "HTML 加载失败")
+                Log.e("stefan", "HTML 加载失败")
                 listener?.invoke("")
                 listener = null
             }
@@ -47,7 +45,7 @@ object PreRequestUtil {
             override fun onResponse(call: Call, response: Response) {
                 val code = response.code
                 val body = response.body?.string()
-                Log.e("chenshan", "HTML 加载成功 $code & $body")
+                Log.e("stefan", "HTML 加载成功 $code & $body")
                 mainHandler.post {
                     listener?.invoke(body ?: "")
                     listener = null
@@ -61,13 +59,13 @@ object PreRequestUtil {
 class PreReqWebViewActivity : AppCompatActivity() {
     companion object {
         fun jump2WebView(context: Context, url: String) {
+            TimeUtil.start()
             PreRequestUtil.preRequest(url)
             context.startActivity(Intent(context, PreReqWebViewActivity::class.java).putExtra("url", url))
         }
     }
 
     private lateinit var webView: WebView
-    private lateinit var webViewModel: WebViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -79,17 +77,15 @@ class PreReqWebViewActivity : AppCompatActivity() {
             insets
         }
 
-
-        //并行请求数据
-        webViewModel = ViewModelProvider(this)[WebViewModel::class.java]
-        webViewModel.requestPageData()
-        webViewModel.data.observe(this) {
-            webView.loadUrl("javascript:send2pageData('$it')")
-        }
-
         val container = findViewById<FrameLayout>(R.id.fl_container)
-        webView = WebViewHolder.instance.bind(this)
-        webView.settings.javaScriptEnabled = true
+        val time = findViewById<TextView>(R.id.tv_time)
+        webView = WebView(this)
+        webView.setLayerType(WebView.LAYER_TYPE_HARDWARE, null) //启动硬件加速
+        webView.settings.apply {
+            javaScriptEnabled = true //启用JavaScript
+            mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW //支持Https与Http混合请求
+            cacheMode = WebSettings.LOAD_NO_CACHE //不使用缓存
+        }
         webView.webViewClient = object : WebViewClient() {
             override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
                 //拦截h5内链接跳转，全部交由 webView 来加载，防止外链跳转至默认浏览器
@@ -99,50 +95,21 @@ class PreReqWebViewActivity : AppCompatActivity() {
 
             override fun onPageFinished(view: WebView?, url: String?) {
                 super.onPageFinished(view, url)
+                if(time.visibility == View.GONE){
+                    time.visibility = View.VISIBLE
+                    time.text = "从点击 -> onPageFinished 总耗时 = ${TimeUtil.end()} ms"
+                }
             }
         }
         container.addView(webView, FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT)
 
         PreRequestUtil.setPreRequestListener {
-            Log.e("chenshan", "加载什么？ $it")
+            Log.e("stefan", "加载什么？ $it")
             if (it.isEmpty()) {
                 webView.loadUrl(intent.getStringExtra("url") ?: "")
             } else {
                 webView.loadDataWithBaseURL(intent.getStringExtra("url") ?: "", it, "text/html", "utf-8", null)
             }
         }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        webView.removeJavascriptInterface("webDemoJSBridge")
-        WebViewHolder.instance.release()
-    }
-}
-
-internal class WebViewModel : ViewModel() {
-    private val _data = MutableLiveData<String>()
-    val data: LiveData<String>
-        get() = _data
-
-    fun requestPageData() {
-        OkHttpClient().newCall(
-            Request.Builder()
-                .url("https://api3.sungohealth.com/content/article/getArticleInfo")
-                .post(
-                    FormBody.Builder()
-                        .add("articleId", "727")
-                        .build()
-                )
-                .build()
-        ).enqueue(object : okhttp3.Callback {
-            override fun onFailure(call: okhttp3.Call, e: IOException) {
-                e.printStackTrace()
-            }
-
-            override fun onResponse(call: okhttp3.Call, response: okhttp3.Response) {
-                _data.postValue(response.body?.string())
-            }
-        })
     }
 }

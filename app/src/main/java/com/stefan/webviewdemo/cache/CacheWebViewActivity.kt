@@ -4,17 +4,21 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
+import android.webkit.WebSettings
 import android.webkit.WebSettings.LOAD_NO_CACHE
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.FrameLayout
+import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.stefan.webviewdemo.R
+import com.stefan.webviewdemo.TimeUtil
 import com.stefan.webviewdemo.pre_reuse.WebViewHolder
 import okhttp3.Cache
 import okhttp3.OkHttpClient
@@ -25,6 +29,7 @@ class CacheWebViewActivity : AppCompatActivity() {
 
     companion object {
         fun jump2WebView(context: Context, url: String) {
+            TimeUtil.start()
             context.startActivity(Intent(context, CacheWebViewActivity::class.java).putExtra("url", url))
         }
     }
@@ -45,8 +50,11 @@ class CacheWebViewActivity : AppCompatActivity() {
         }
 
         val container = findViewById<FrameLayout>(R.id.fl_container)
+        val time = findViewById<TextView>(R.id.tv_time)
         webView = WebViewHolder.instance.bind(this)
+        webView.setLayerType(WebView.LAYER_TYPE_HARDWARE, null) //启动硬件加速
         webView.settings.apply {
+            mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW //支持Https与Http混合请求
             cacheMode = LOAD_NO_CACHE //不缓存
             javaScriptEnabled = true
         }
@@ -55,6 +63,14 @@ class CacheWebViewActivity : AppCompatActivity() {
                 //拦截h5内链接跳转，全部交由 webView 来加载，防止外链跳转至默认浏览器
                 view?.loadUrl(request?.url.toString())
                 return true
+            }
+
+            override fun onPageFinished(view: WebView?, url: String?) {
+                super.onPageFinished(view, url)
+                if(time.visibility == View.GONE){
+                    time.visibility = View.VISIBLE
+                    time.text = "从点击 -> onPageFinished 总耗时 = ${TimeUtil.end()} ms"
+                }
             }
 
             override fun shouldInterceptRequest(view: WebView?, request: WebResourceRequest?): WebResourceResponse? {
@@ -121,7 +137,7 @@ class CacheWebViewActivity : AppCompatActivity() {
                 return resourceResponse
             }
         } catch (e: Throwable) {
-            Log.e("chenshan", "请求异常 = $e")
+            Log.e("stefan", "请求异常 = $e")
         }
         return null
     }

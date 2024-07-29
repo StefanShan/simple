@@ -37,25 +37,19 @@
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script>
-        function send2pageData(result) {
-            var data = JSON.parse(result)
-            document.getElementById('head').src = data.picUrl
-            document.getElementById('title').innerText = data.title
-            document.getElementById('content').innerText = data.content
-        }
         document.addEventListener('DOMContentLoaded', function() {
-            var result = webDemoJSBridge.getPageData()
-            if (result == "") return
-            var data = JSON.parse(result)
-            document.getElementById('head').src = data.picUrl
-            document.getElementById('title').innerText = data.title
-            document.getElementById('content').innerText = data.content
+            console.log('DOM loaded');
+            fetch('https://api.github.com/repos/krahets/hello-algo', {method: 'GET'})
+                .then(data => {
+                    defJSBridge.onRequestFinish()
+                    console.log('request finish');
+                    document.getElementById('head').src = "https://p6.music.126.net/obj/wonDlsKUwrLClGjCm8Kx/44658970730/341c/8047/eb07/a960603716d5d927a5bfb9c961329f95.jpg";
+                    document.getElementById('title').innerText = "AI 入门到放弃之 Transformer";
+                    document.getElementById('content').innerText = "让模型在处理一个序列元素时，能够考虑到序列中所有元素的信息，而不仅仅是相邻的元素。考虑所有元素信息的关键：自注意力机制 + 位置编码。Transformer模型主要由两部分组成：编码器（Encoder）‌和解码器（Decoder）‌。编码器负责将输入序列转换为一系列连续的向量表示，而解码器则利用这些向量表示以及先前生成的输出序列来生成最终的输出。";
+                })
+                .catch(error => console.error('Error:', error));
         });
 
-        window.onload = () => {
-            console.log('页面加载完成');
-            webDemoJSBridge.onPageLoaded()
-        };
     </script>
 </body>
 </html>

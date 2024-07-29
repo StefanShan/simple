@@ -1,10 +1,11 @@
-package com.stefan.webviewdemo.pre_reuse
+package com.stefan.webviewdemo.parallel
 
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.view.KeyEvent
+import android.util.Log
 import android.view.View
+import android.webkit.JavascriptInterface
 import android.webkit.WebResourceRequest
 import android.webkit.WebSettings
 import android.webkit.WebView
@@ -17,18 +18,18 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.stefan.webviewdemo.R
 import com.stefan.webviewdemo.TimeUtil
+import com.stefan.webviewdemo.pre_reuse.WebViewHolder
 
-class DynamicWebViewActivity : AppCompatActivity() {
+class SerialWebActivity : AppCompatActivity() {
 
     companion object{
         fun jump2WebView(context: Context, url: String){
             TimeUtil.start()
-            context.startActivity(Intent(context, DynamicWebViewActivity::class.java).putExtra("url", url))
+            context.startActivity(Intent(context, SerialWebActivity::class.java).putExtra("url", url))
         }
     }
 
     private lateinit var webView: WebView
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,23 +42,13 @@ class DynamicWebViewActivity : AppCompatActivity() {
         }
 
         val container = findViewById<FrameLayout>(R.id.fl_container)
-        val time = findViewById<TextView>(R.id.tv_time)
 
         webView = WebViewHolder.instance.bind(this)
-
         webView.webViewClient = object : WebViewClient(){
             override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
                 //拦截h5内链接跳转，全部交由 webView 来加载，防止外链跳转至默认浏览器
                 view?.loadUrl(request?.url.toString())
                 return true
-            }
-
-            override fun onPageFinished(view: WebView?, url: String?) {
-                super.onPageFinished(view, url)
-                if(time.visibility == View.GONE){
-                    time.visibility = View.VISIBLE
-                    time.text = "从点击 -> onPageFinished 总耗时 = ${TimeUtil.end()} ms"
-                }
             }
         }
 
@@ -67,21 +58,15 @@ class DynamicWebViewActivity : AppCompatActivity() {
             mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW //支持Https与Http混合请求
             cacheMode = WebSettings.LOAD_NO_CACHE //不使用缓存
         }
+        webView.addJavascriptInterface(DefJSBridge(),"defJSBridge")
         container.addView(webView, FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT)
         webView.loadUrl(intent.getStringExtra("url")?:"")
     }
+}
 
-    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
-        //需要代理判断 canGoBack
-        if (keyCode == KeyEvent.KEYCODE_BACK && WebViewHolder.instance.canGoBack(webView)) {
-           webView.goBack()
-            return true
-        }
-        return super.onKeyDown(keyCode, event)
-    }
-
-    override fun onDestroy() {
-        WebViewHolder.instance.recycle(webView)
-        super.onDestroy()
+internal class DefJSBridge{
+    @JavascriptInterface
+    fun onRequestFinish(){
+        Log.e("stefan", "完整耗时= ${TimeUtil.end()}")
     }
 }

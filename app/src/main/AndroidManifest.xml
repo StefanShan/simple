@@ -15,11 +15,17 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.WebViewDemo"
         tools:targetApi="31">
+        <activity android:name=".parallel.SerialWebActivity"
+            android:exported="false"/>
+        <activity
+            android:name=".pre_reuse.DefWebActivity"
+            android:exported="false" />
         <activity
             android:name=".cache.CacheWebViewActivity"
             android:exported="false" />
-        <activity android:name=".pre_load.PreLoadWebViewActivity"
-            android:exported="false"/>
+        <activity
+            android:name=".pre_load.PreLoadWebViewActivity"
+            android:exported="false" />
         <activity
             android:name=".pre_request.PreReqWebViewActivity"
             android:exported="false" />
