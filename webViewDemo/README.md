@@ -1,4 +1,4 @@
-# 文章详解 -> [探索 WebView 加载优化](https://stefanshan.github.io/blog/KnowledgeRepo/Android/WebView%E5%8A%A0%E8%BD%BD%E4%BC%98%E5%8C%96.html)
+# 文章详解 -> [探索 WebView 加载优化](https://stefanshan.github.io/blog/doc/Android/WebView%E5%8A%A0%E8%BD%BD%E4%BC%98%E5%8C%96.html)
  <table>
     <caption>
     以下数据均为 20次实验平均耗时（去掉最快和最慢的一次）
